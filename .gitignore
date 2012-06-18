@@ -3,7 +3,6 @@
 .bundle
 .config
 bin/
-Rakefile
 coverage
 InstalledFiles
 lib/bundler/man
