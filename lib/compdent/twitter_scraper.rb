@@ -7,8 +7,15 @@ class Compdent::TwitterScraper
   end
 
   def retrieve
-    Compdent::Tweeter.new :screen_name => @screen_name,
-    :following_ids => following_ids
+    tweeter = Compdent::TweeterRepository.find_first_by_screen_name(@screen_name)
+
+    unless tweeter
+      tweeter = Compdent::Tweeter.new(:screen_name => @screen_name,
+        :following_ids => following_ids)
+      Compdent::TweeterRepository.save(tweeter)
+    end
+
+    tweeter
   end
 
   protected
@@ -21,8 +28,17 @@ class Compdent::TwitterScraper
 end
 
 class Compdent::Tweeter
+
   include Curator::Model
 
-  attr_accessor :id, :screen_name, :following_ids
+  attr_accessor :id, :user_id, :screen_name, :following_ids
+
+end
+
+class Compdent::TweeterRepository
+
+  include Curator::Repository
+
+  indexed_fields :screen_name, :user_id
 
 end

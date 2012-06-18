@@ -26,4 +26,16 @@ describe Compdent::TwitterScraper do
     its(:following_ids) { should == [144951864,564399073,561022558] }
 
   end
+
+  context 'tweeter already exists' do
+    before do
+      tweeter = Compdent::Tweeter.new :screen_name => screen_name
+      Compdent::TweeterRepository.save(tweeter)
+    end
+
+    subject { scraper.retrieve }
+
+    its(:following_ids) { should be_nil }
+  end
+
 end

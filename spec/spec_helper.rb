@@ -2,7 +2,10 @@ require File.dirname(__FILE__) + '/../lib/compdent'
 
 require 'webmock/rspec' # mock http responses
 
-Curator.configure(:memory)
+Curator.configure(:memory) do |config|
+  config.environment = 'test'
+  config.migrations_path = File.expand_path(File.dirname(__FILE__) + "/../db/migrate")
+end
 
 RSpec.configure do |config|
   config.mock_with :rspec
