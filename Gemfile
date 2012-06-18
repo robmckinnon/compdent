@@ -7,3 +7,5 @@ gem 'grackle' # wrapper around Twitter REST and Search APIs
 gem 'rspec'
 gem 'guard-rspec'
 gem 'webmock'
+
+gem 'rake' # required for travis builds
