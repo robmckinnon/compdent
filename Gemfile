@@ -1,11 +1,8 @@
-# A sample Gemfile
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-# gem "rails"
+gem 'curator' # model and repository framework
 
-gem "mongoid", "~> 3.0.0.rc"
-
-gem 'grackle'
+gem 'grackle' # wrapper around Twitter REST and Search APIs
 
 gem 'rspec'
 gem 'guard-rspec'

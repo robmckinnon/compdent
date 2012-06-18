@@ -1,12 +1,10 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe TwitterScraper do
+describe Compdent::TwitterScraper do
 
   let(:screen_name) { 'tweeter' }
 
-  subject { TwitterScraper.new(screen_name) }
-
-  its(:screen_name) { should == screen_name }
+  let(:scraper) { Compdent::TwitterScraper.new(screen_name) }
 
   context 'tweeter follows other tweeters' do
     before do
@@ -21,6 +19,11 @@ describe TwitterScraper do
         }'
     end
 
+    subject { scraper.retrieve }
+
+    its(:screen_name) { should == screen_name }
+
     its(:following_ids) { should == [144951864,564399073,561022558] }
+
   end
 end
