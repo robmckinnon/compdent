@@ -1,2 +1,1 @@
-compdent
-========
+# compdent [![Build Status](https://secure.travis-ci.org/robmckinnon/compdent.png)](http://travis-ci.org/robmckinnon/compdent)
