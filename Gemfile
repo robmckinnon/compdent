@@ -1,11 +1,13 @@
 source 'https://rubygems.org'
 
-gem 'curator' # model and repository framework
+gem 'mongoid' # model and repository framework
 
 gem 'grackle' # wrapper around Twitter REST and Search APIs
 
-gem 'rspec'
-gem 'guard-rspec'
-gem 'webmock'
+group :test do
+  gem 'rspec'
+  gem 'guard-rspec'
+  gem 'webmock'
+end
 
 gem 'rake' # required for travis builds

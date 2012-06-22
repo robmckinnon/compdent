@@ -1,3 +1,4 @@
+require 'active_support/core_ext/array/grouping'
 
 class Compdent::TwitterScraper
 
@@ -7,18 +8,27 @@ class Compdent::TwitterScraper
   end
 
   def retrieve
-    tweeter = Compdent::TweeterRepository.find_first_by_screen_name(@screen_name)
+    tweeter = Compdent::Tweeter.where(:screen_name => @screen_name).first
 
     unless tweeter
       tweeter = Compdent::Tweeter.new(:screen_name => @screen_name,
         :following_ids => following_ids)
-      Compdent::TweeterRepository.save(tweeter)
+
+      lookup following_ids
+      tweeter.save
     end
 
     tweeter
   end
 
   protected
+
+  def lookup following_ids
+    following_ids.in_groups_of(100, false) do |user_ids|
+      result = @twitter.users.lookup!(:user_id => user_ids.join(','))
+      result
+    end
+  end
 
   def following_ids
     result = @twitter.friends.ids?(:screen_name => @screen_name)
@@ -29,16 +39,12 @@ end
 
 class Compdent::Tweeter
 
-  include Curator::Model
+  include Mongoid::Document
 
-  attr_accessor :id, :user_id, :screen_name, :following_ids
+  field :user_id, type: Integer
+  field :screen_name, type: String
+  field :following_ids, type: Array
 
+  attr_readonly :user_id
 end
 
-class Compdent::TweeterRepository
-
-  include Curator::Repository
-
-  indexed_fields :screen_name, :user_id
-
-end

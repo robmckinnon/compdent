@@ -1,10 +1,12 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe Compdent::TwitterScraper do
+include Compdent
+
+describe TwitterScraper do
 
   let(:screen_name) { 'tweeter' }
 
-  let(:scraper) { Compdent::TwitterScraper.new(screen_name) }
+  let(:scraper) { TwitterScraper.new(screen_name) }
 
   context 'tweeter follows other tweeters' do
     before do
@@ -17,6 +19,25 @@ describe Compdent::TwitterScraper do
           ,"previous_cursor":0,
           "next_cursor_str":"0"
         }'
+
+      stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
+        with(:body => {"user_id"=>"144951864,564399073,561022558"}).
+        to_return :body => '[{
+        "name": "Twitter API",
+        "url": "http://apiwiki.twitter.com",
+        "id": 6253282,
+        "screen_name": "twitterapi"
+        },
+        {
+        "name": "Twitter",
+        "url": "http://twitter.com",
+        "id": 783214,
+        "screen_name": "twitter"
+        }]'
+    end
+
+    after do
+      Tweeter.delete_all
     end
 
     subject { scraper.retrieve }
@@ -29,8 +50,8 @@ describe Compdent::TwitterScraper do
 
   context 'tweeter already exists' do
     before do
-      tweeter = Compdent::Tweeter.new :screen_name => screen_name
-      Compdent::TweeterRepository.save(tweeter)
+      tweeter = Tweeter.new :screen_name => screen_name
+      tweeter.save
     end
 
     subject { scraper.retrieve }
