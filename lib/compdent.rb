@@ -3,6 +3,7 @@ require 'mongoid'
 module Compdent
 end
 
+require File.dirname(__FILE__) + '/compdent/twitter'
 require File.dirname(__FILE__) + '/compdent/twitter_scraper'
 require 'grackle'
 

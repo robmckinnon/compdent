@@ -15,13 +15,13 @@ describe TwitterScraper do
         to_return :body => '{
           "previous_cursor_str":"0",
           "next_cursor":0,
-          "ids":[144951864,564399073,561022558]
+          "ids":[6253282,783214]
           ,"previous_cursor":0,
           "next_cursor_str":"0"
         }'
 
       stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
-        with(:body => {"user_id"=>"144951864,564399073,561022558"}).
+        with(:body => {"user_id"=>"6253282,783214"}).
         to_return :body => '[{
         "name": "Twitter API",
         "url": "http://apiwiki.twitter.com",
@@ -44,7 +44,7 @@ describe TwitterScraper do
 
     its(:screen_name) { should == screen_name }
 
-    its(:following_ids) { should == [144951864,564399073,561022558] }
+    its(:following_ids) { should == [6253282,783214] }
 
   end
 
