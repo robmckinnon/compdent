@@ -9,4 +9,11 @@ group :test do
   gem 'webmock'
 end
 
+group :development do
+  gem 'fattr'
+  gem 'arrayfields'
+  gem 'map'
+  gem 'metrical'
+end
+
 gem 'rake' # required for travis builds

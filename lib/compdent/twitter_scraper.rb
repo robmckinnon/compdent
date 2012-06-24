@@ -2,6 +2,7 @@ require 'active_support/core_ext/array/grouping'
 
 module Compdent
 
+  # Scrapes Twitter account information
   class TwitterScraper
 
     def initialize screen_name

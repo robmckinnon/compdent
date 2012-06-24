@@ -2,15 +2,16 @@ require 'active_support/core_ext/array/grouping'
 
 module Compdent
 
+  # represents Twitter account information
   class Tweeter
 
     include Mongoid::Document
 
-    field :user_id, type: Integer
-    field :screen_name, type: String
-    field :name, type: String
-    field :url, type: String
-    field :following_ids, type: Array
+    field :user_id, :type => Integer
+    field :screen_name, :type => String
+    field :name, :type => String
+    field :url, :type => String
+    field :following_ids, :type => Array
 
     attr_readonly :user_id
 
@@ -25,10 +26,21 @@ module Compdent
     end
 
     def update_data data
-      write_attributes :name => data.name,
-          :screen_name => data.screen_name,
-          :url => data.url
+      write_attributes TweeterData.new(data).hash
       save
+    end
+  end
+
+  # temp holder of data
+  class TweeterData
+    def initialize data
+      @data = data
+    end
+
+    def hash
+      { :name => @data.name,
+        :screen_name => @data.screen_name,
+        :url => @data.url }
     end
   end
 end
