@@ -4,3 +4,10 @@ development:
       database: mongoid
       hosts:
         - localhost:27017
+
+test:
+  sessions:
+    default:
+      database: mongoid
+      hosts:
+        - 127.0.0.1:27017
