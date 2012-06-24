@@ -35,4 +35,23 @@ describe TwitterScraper do
       Tweeter.delete_all
     end
   end
+
+  describe "updating data" do
+    let(:user_id) { 123 }
+    let(:tweeter) { Tweeter.from_user_id(user_id) }
+    let(:url) { "http://twitter.com" }
+    let(:screen_name) { "twitter" }
+    let(:name) { "Twitter" }
+    let(:data) { mock('tweeter', :name => name,
+      :url => url,
+      :id => user_id,
+      :screen_name => screen_name ) }
+
+    after { Tweeter.delete_all }
+
+    subject { tweeter.update_data(data) ; Tweeter.from_user_id(user_id) }
+    its(:url) { should == url}
+    its(:screen_name) { should == screen_name}
+    its(:name) { should == name}
+  end
 end
