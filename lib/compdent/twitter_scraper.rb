@@ -10,20 +10,22 @@ module Compdent
     end
 
     def retrieve
-      tweeter = Tweeter.from_screen_name @screen_name
+      tweeter = Tweeter.from_screen_name(@screen_name)
 
-      following_ids = @twitter.following_ids(@screen_name)
+      tweeter.following_ids = @twitter.following_ids(@screen_name)
 
-      if tweeter.following_ids != following_ids
-        tweeter.following_ids = following_ids
-        @twitter.each_lookup(following_ids) do |data|
-        end
+      if tweeter.following_ids_changed?
+        retrieve_following(tweeter.following_ids)
         tweeter.save
       end
 
       tweeter
     end
 
+    def retrieve_following following_ids
+      @twitter.each_lookup(following_ids) do |data|
+      end
+    end
   end
 
 end
