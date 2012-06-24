@@ -1,10 +1,14 @@
-class TwitterIds
+module Compdent
 
-  def initialize ids
-    @ids = ids
-  end
+  # holds collection of Twitter ids
+  class TwitterIds
 
-  def new_ids
-    @ids.select {|id| !Tweeter.user_id_exists?(id) }
+    def initialize ids
+      @ids = ids
+    end
+
+    def new_ids
+      @ids.select {|id| !Tweeter.user_id_exists?(id) }
+    end
   end
 end
