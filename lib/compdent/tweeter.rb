@@ -15,7 +15,14 @@ module Compdent
 
     attr_readonly :user_id
 
+    index({ :user_id => 1 }, :unique => true, :name => 'user_id_index' )
+
     class << self
+
+      def user_id_exists? user_id
+        where(:user_id => user_id).exists?
+      end
+
       def from_screen_name name
         find_or_create_by(:screen_name => name)
       end

@@ -8,6 +8,17 @@ describe TwitterScraper do
   let(:user_id) { 1234 }
   let(:tweeter) { 'mock tweeter' }
 
+  describe "user_id_exists?" do
+    it 'should be true if exists' do # tests mongoid
+      Tweeter.from_user_id user_id
+      Tweeter.user_id_exists?(user_id).should be_true
+      Tweeter.delete_all
+    end
+    it 'should be false if does not exist' do # tests mongoid
+      Tweeter.user_id_exists?(user_id).should be_false
+    end
+  end
+
   describe 'from_screen_name' do
 
     it 'should find_or_create_by screen_name' do

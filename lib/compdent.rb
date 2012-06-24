@@ -5,6 +5,7 @@ end
 
 require File.dirname(__FILE__) + '/compdent/twitter'
 require File.dirname(__FILE__) + '/compdent/tweeter'
+require File.dirname(__FILE__) + '/compdent/twitter_ids'
 require File.dirname(__FILE__) + '/compdent/twitter_scraper'
 require 'grackle'
 
