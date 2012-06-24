@@ -24,7 +24,9 @@ module Compdent
     end
 
     def retrieve_following following_ids
-      @twitter.each_lookup(following_ids) do |data|
+      ids = TwitterIds.new(following_ids).new_ids
+
+      @twitter.each_lookup(ids) do |data|
         tweeter = Tweeter.from_user_id data.id
         tweeter.update_data data
       end
