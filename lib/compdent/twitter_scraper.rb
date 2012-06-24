@@ -12,11 +12,12 @@ module Compdent
     def retrieve
       tweeter = Tweeter.from_screen_name @screen_name
 
-      unless tweeter
-        following_ids = @twitter.following_ids(@screen_name)
-        tweeter = Tweeter.new(:screen_name => @screen_name, :following_ids => following_ids)
+      following_ids = @twitter.following_ids(@screen_name)
 
-        @twitter.each_lookup(following_ids) { }
+      if tweeter.following_ids != following_ids
+        tweeter.following_ids = following_ids
+        @twitter.each_lookup(following_ids) do |data|
+        end
         tweeter.save
       end
 
@@ -25,20 +26,4 @@ module Compdent
 
   end
 
-  class Tweeter
-
-    include Mongoid::Document
-
-    field :user_id, type: Integer
-    field :screen_name, type: String
-    field :following_ids, type: Array
-
-    attr_readonly :user_id
-
-    class << self
-      def from_screen_name name
-        where(:screen_name => name).first
-      end
-    end
-  end
 end

@@ -9,54 +9,40 @@ describe TwitterScraper do
   let(:scraper) { TwitterScraper.new(screen_name) }
 
   context 'tweeter follows other tweeters' do
-    before do
-      stub_http_request(:get, "api.twitter.com/1/friends/ids.json").
-        with(:query => { 'screen_name' => 'tweeter'}).
-        to_return :body => '{
-          "previous_cursor_str":"0",
-          "next_cursor":0,
-          "ids":[6253282,783214]
-          ,"previous_cursor":0,
-          "next_cursor_str":"0"
-        }'
 
-      stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
-        with(:body => {"user_id"=>"6253282,783214"}).
-        to_return :body => '[{
-        "name": "Twitter API",
-        "url": "http://apiwiki.twitter.com",
-        "id": 6253282,
-        "screen_name": "twitterapi"
-        },
-        {
-        "name": "Twitter",
-        "url": "http://twitter.com",
-        "id": 783214,
-        "screen_name": "twitter"
-        }]'
+    let(:following_ids) { [6253282,783214] }
+    let(:twitter) { mock('twitter') }
+    let(:tweeter) { mock('tweeter', :name => "Twitter",
+        :url => "http://twitter.com",
+        :id => 783214,
+        :screen_name => "twitter" ) }
+
+    before do
+      Twitter.stub(:new).and_return twitter
+      twitter.stub(:following_ids).and_return following_ids
+      twitter.stub(:each_lookup).and_yield tweeter
     end
 
     after do
       Tweeter.delete_all
     end
 
-    subject { scraper.retrieve }
+    describe "asked to retrieve by screen_name" do
+      it 'should find following_ids' do
+        twitter.should_receive(:following_ids).with(screen_name).and_return following_ids
+        scraper.retrieve
+      end
 
-    its(:screen_name) { should == screen_name }
+      it 'should call Twitter each lookup with following_ids' do
+        twitter.should_receive(:each_lookup).with(following_ids).and_yield mock('tweeter')
+        scraper.retrieve
+      end
 
-    its(:following_ids) { should == [6253282,783214] }
+      it 'should create Tweeter from lookup data' do
 
-  end
-
-  context 'tweeter already exists' do
-    before do
-      tweeter = Tweeter.new :screen_name => screen_name
-      tweeter.save
+      end
     end
 
-    subject { scraper.retrieve }
-
-    its(:following_ids) { should be_nil }
   end
 
 end
