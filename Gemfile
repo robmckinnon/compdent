@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'mongoid' # model and repository framework
 gem 'grackle' # wrapper around Twitter REST and Search APIs
+gem 'whois'
 
 group :test do
   gem 'rspec'

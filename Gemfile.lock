@@ -121,6 +121,7 @@ GEM
     webmock (1.8.7)
       addressable (>= 2.2.7)
       crack (>= 0.1.7)
+    whois (2.6.2)
 
 PLATFORMS
   ruby
@@ -136,3 +137,4 @@ DEPENDENCIES
   rake
   rspec
   webmock
+  whois
