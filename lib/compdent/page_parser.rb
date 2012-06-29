@@ -25,17 +25,18 @@ module Compdent
     end
 
     def characters characters
-      if @state = :link
-        @characters ||= ''
-        @characters += characters
+      if @state == :link
+        @text ||= ''
+        @text += characters
       end
     end
 
     def end_element name
-      if @state = :link && name == 'a'
-        if @characters[/Contact us/]
+      if @state == :link && name == 'a'
+        case @text
+        when /Contact us/
           @listener.contact_us_uri(@href)
-        elsif @characters[/About us/]
+        when /About us/
           @listener.about_us_uri(@href)
         end
         @state = nil
