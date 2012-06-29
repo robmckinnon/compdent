@@ -3,6 +3,7 @@ require 'mongoid'
 module Compdent
 end
 
+require File.dirname(__FILE__) + '/compdent/page_parser'
 require File.dirname(__FILE__) + '/compdent/uri_scraper'
 require File.dirname(__FILE__) + '/compdent/twitter'
 require File.dirname(__FILE__) + '/compdent/tweeter'

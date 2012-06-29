@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'nokogiri'
 gem 'mongoid' # model and repository framework
 gem 'grackle' # wrapper around Twitter REST and Search APIs
 gem 'whois'
