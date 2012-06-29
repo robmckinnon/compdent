@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 include Compdent
@@ -33,12 +34,22 @@ describe Compdent::PageParser do
     end
   end
 
-  context 'Contact Us link in page' do
+  context 'About Us link in page' do
     let(:html) { "<a href='#{uri}'>About us</a>" }
     let(:uri_path) { 'about-us' }
 
     it 'should callback contact_us_uri' do
       listener.should_receive(:about_us_uri).with(uri)
+      do_parse
+    end
+  end
+
+  context 'copywrite line' do
+    let(:line) { 'Copyright &copy; Acme Ltd 2007. All rights reserved' }
+    let(:html) { %Q|<p class="floatl">#{line}</p>| }
+
+    it 'should callback copyright_line' do
+      listener.should_receive(:copyright_line).with('Copyright © Acme Ltd 2007. All rights reserved')
       do_parse
     end
   end
