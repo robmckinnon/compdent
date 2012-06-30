@@ -63,18 +63,13 @@ module Compdent
 
     def handle_anchor attributes
       href = attributes.assoc('href').try(:last)
-      @href = if href
-        if href[/^http/]
-          href
-        elsif href[/google_ads|mailto/]
-          nil
-        else
-          @base_uri.merge(href).to_s rescue URI::InvalidURIError
-        end
-      else
-        nil
-      end
       @states << :link
+
+      @href = if href && href[/^http/]
+        href
+      else
+        @base_uri.merge(href).to_s rescue URI::InvalidURIError
+      end
     end
 
     def characters characters
@@ -103,30 +98,32 @@ module Compdent
 
     def finish_paragraph
       begin
-        escaped = URI.escape(@paragraph)
-        case escaped
-        when /%C2%A9/
-          copyright_line( URI.unescape(escaped.sub('%C2%A9','&copy;')) )
-          @paragraph = nil
-          @states.pop
-        else
-          @paragraph = nil
-          nil
-        end
+        complete_paragraph
       rescue
         nil
+      end
+    end
+
+    COPYRIGHT_SYMBOL = /%C2%A9/
+
+    def complete_paragraph
+      escaped = URI.escape(@paragraph)
+      @paragraph = nil
+
+      if escaped[COPYRIGHT_SYMBOL]
+        line = URI.unescape(escaped.sub('%C2%A9','&copy;'))
+        copyright_line( line )
+        @states.pop
       end
     end
 
     def copyright_line line
       parser = CopyrightParser.new(line)
       @listener.copyright_organisation_name(parser.organisation_name)
-      case number = parser.company_number
-      when Array
-        number.each {|no| @listener.copyright_company_number(no) }
-      else
-        @listener.copyright_company_number(number)
-      end
+      number = parser.company_number
+      number = [number] unless number.is_a?(Array)
+
+      number.each {|no| @listener.copyright_company_number(no) }
     end
 
     def finish_anchor
