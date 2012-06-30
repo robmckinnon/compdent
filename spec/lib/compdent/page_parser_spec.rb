@@ -1,7 +1,6 @@
 # encoding: utf-8
 require File.dirname(__FILE__) + '/../../spec_helper'
-
-include Compdent
+require File.dirname(__FILE__) + '/../../../lib/compdent/page_parser'
 
 describe Compdent::PageParser do
 
@@ -45,12 +44,35 @@ describe Compdent::PageParser do
   end
 
   context 'copywrite line' do
-    let(:line) { 'Copyright &copy; Acme Ltd 2007. All rights reserved' }
+    let(:line) { 'Copyright &copy; Acme Ltd 2007. All rights reserved. Registered in England No 0123456' }
     let(:html) { %Q|<p class="floatl">#{line}</p>| }
 
+    before do
+      listener.stub(:copyright_company_number)
+      listener.stub(:copyright_organisation_name)
+    end
+
     it 'should callback copyright_line' do
-      listener.should_receive(:copyright_line).with('Copyright © Acme Ltd 2007. All rights reserved')
+      parser.should_receive(:copyright_line).with(line)
       do_parse
+    end
+
+    it 'should callback copyright_company_number' do
+      listener.should_receive(:copyright_company_number).with('0123456')
+      do_parse
+    end
+
+    it 'should callback copyright_organisation_name' do
+      listener.should_receive(:copyright_organisation_name).with('Acme Ltd')
+      do_parse
+    end
+
+    context "with two company numbers" do
+      let(:line) { '&copy; registered in England and Wales with company registration numbers 04252091 & 04252093' }
+      it 'should callback copyright_company_number twice' do
+        listener.should_receive(:copyright_company_number).with('04252091').with('04252093').ordered
+        do_parse
+      end
     end
   end
 

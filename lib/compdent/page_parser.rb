@@ -3,6 +3,24 @@ require 'nokogiri'
 
 module Compdent
 
+  module DefaultPageListener
+    def self.about_us_uri uri
+      # puts "  about us: #{uri}"
+    end
+
+    def self.contact_us_uri uri
+      # puts "  contact us: #{uri}"
+    end
+
+    def self.copyright_organisation_name name
+      puts "\n   name: #{name}\n"
+    end
+
+    def self.copyright_company_number number
+      puts "\n   number: #{number}\n"
+    end
+  end
+
   # Calls callbacks when interesting stuff found in page
   class PageParser
     def initialize listener
@@ -17,6 +35,15 @@ module Compdent
     end
 
     def start_document
+    end
+
+    def comment text
+    end
+
+    def cdata_block text
+    end
+
+    def error text
     end
 
     def start_element name, attributes
@@ -36,7 +63,17 @@ module Compdent
 
     def handle_anchor attributes
       href = attributes.assoc('href').try(:last)
-      @href = href ? @base_uri.merge(href).to_s : nil
+      @href = if href
+        if href[/^http/]
+          href
+        elsif href[/google_ads|mailto/]
+          nil
+        else
+          @base_uri.merge(href).to_s rescue URI::InvalidURIError
+        end
+      else
+        nil
+      end
       @states << :link
     end
 
@@ -58,20 +95,37 @@ module Compdent
       when :link
         finish_anchor if name == 'a'
       when :paragraph
-        finish_paragraph if name == 'p'
+        finish_paragraph if name == 'p' && @paragraph
       else
         nil
       end
     end
 
     def finish_paragraph
-      case URI.escape(@paragraph)
-      when /%C2%A9/
-        @listener.copyright_line(@paragraph)
-        @paragraph = nil
-        @states.pop
-      else
+      begin
+        escaped = URI.escape(@paragraph)
+        case escaped
+        when /%C2%A9/
+          copyright_line( URI.unescape(escaped.sub('%C2%A9','&copy;')) )
+          @paragraph = nil
+          @states.pop
+        else
+          @paragraph = nil
+          nil
+        end
+      rescue
         nil
+      end
+    end
+
+    def copyright_line line
+      parser = CopyrightParser.new(line)
+      @listener.copyright_organisation_name(parser.organisation_name)
+      case number = parser.company_number
+      when Array
+        number.each {|no| @listener.copyright_company_number(no) }
+      else
+        @listener.copyright_company_number(number)
       end
     end
 
