@@ -51,6 +51,7 @@ module Compdent
     TO_REMOVE = ['Footer links ',
       /Copyright\sof\s|Copyright\sby\s|Copyright\s/,
       /\sAll\srights\sreserved/i,
+      /All\scontent\sis\s/,
       /#{C}\s/,
       /\s#{C}/]
 
