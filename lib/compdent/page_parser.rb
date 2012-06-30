@@ -23,97 +23,43 @@ module Compdent
 
   # Calls callbacks when interesting stuff found in page
   class PageParser
+
+    COPYRIGHT_SYMBOL = /%C2%A9/
+
     def initialize listener
       @listener = listener
-      @parser = Nokogiri::HTML::SAX::Parser.new(self)
-      @states = []
     end
 
     def parse html, base_uri
       @base_uri = URI(base_uri)
-      @parser.parse(html)
+      html.gsub!('&nbsp;',' ')
+      @doc = Nokogiri.HTML(html)
+      handle_anchors
+      handle_paragraphs
     end
 
-    def start_document
-    end
-
-    def comment text
-    end
-
-    def cdata_block text
-    end
-
-    def error text
-    end
-
-    def start_element name, attributes
-      case name
-      when 'a'
-        handle_anchor attributes
-      when 'p'
-        handle_paragraph
-      else
-        nil
-      end
-    end
-
-    def handle_paragraph
-      @states << :paragraph
-    end
-
-    def handle_anchor attributes
-      href = attributes.assoc('href').try(:last)
-      @states << :link
-
-      @href = if href && href[/^http/]
-        href
-      else
-        @base_uri.merge(href).to_s rescue URI::InvalidURIError
-      end
-    end
-
-    def characters characters
-      case @states.last
-      when :link
-        @link_text ||= ''
-        @link_text += characters
-      when :paragraph
-        @paragraph ||= ''
-        @paragraph += characters
-      else
-        nil
-      end
-    end
-
-    def end_element name
-      case @states.last
-      when :link
-        finish_anchor if name == 'a'
-      when :paragraph
-        finish_paragraph if name == 'p' && @paragraph
-      else
-        nil
-      end
-    end
-
-    def finish_paragraph
-      begin
+    def handle_paragraphs
+      @doc.search('p').each do |para|
+        @paragraph = para.inner_text
         complete_paragraph
-      rescue
-        nil
       end
     end
 
-    COPYRIGHT_SYMBOL = /%C2%A9/
+    def handle_anchors
+      @doc.search('a').each do |anchor|
+        @link_text = anchor.inner_text
+        @href = @base_uri.merge(anchor['href']).to_s
+        finish_anchor
+      end
+    end
 
     def complete_paragraph
       escaped = URI.escape(@paragraph)
       @paragraph = nil
 
       if escaped[COPYRIGHT_SYMBOL]
-        line = URI.unescape(escaped.sub('%C2%A9','&copy;'))
+        line = URI.unescape(escaped.sub(COPYRIGHT_SYMBOL,'&copy;'))
         copyright_line( line )
-        @states.pop
       end
     end
 
@@ -136,10 +82,6 @@ module Compdent
         nil
       end
       @link_text = nil
-      @states.pop
-    end
-
-    def end_document
     end
 
   end

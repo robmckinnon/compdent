@@ -22,6 +22,11 @@ module Compdent
     end
 
     def organisation_name
+      name = find_organisation_name
+      name ? name.split(/\s\|\s/).first : name
+    end
+
+    def find_organisation_name
       case @line.cleaned
       when /(.+)\s#{YEAR}(\s|$|\.)/
         $1
@@ -62,7 +67,7 @@ module Compdent
       @line.gsub!(/\s/,' ')
       @line.squeeze!(' ')
       @line.strip!
-      # puts line if line.size > 0
+      # puts @line if @line.size > 0
 
       TO_REMOVE.each {|remove| @line.sub!(remove,'') }
     end

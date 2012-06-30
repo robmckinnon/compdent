@@ -55,7 +55,7 @@ describe Compdent::CopyrightParser do
   describe "asked for organisation name" do
 
     context "name after copyright symbol and year" do
-      let(:line) { "#{copyright_symbol} #{year} #{name}"}
+      let(:line) { "#{copyright_symbol} #{year} #{name} | Website design by Blah"}
       include_examples 'correct name'
     end
 
