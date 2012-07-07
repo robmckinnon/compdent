@@ -25,7 +25,6 @@ module Compdent
       end
     end
 
-
     def users_lookup user_ids
       @twitter.users.lookup!(:user_id => user_ids.join(','))
     end

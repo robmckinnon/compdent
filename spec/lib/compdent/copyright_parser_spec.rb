@@ -9,6 +9,7 @@ describe Compdent::CopyrightParser do
   let(:year) { '2007' }
   let(:copyright_symbol) { '&copy;' }
   let(:name) { 'Acme' }
+  let(:website_name) { 'Acme.co.uk' }
   let(:number) { 'SC894646' }
 
   shared_examples 'correct number' do
@@ -46,8 +47,23 @@ describe Compdent::CopyrightParser do
       include_examples 'correct number'
     end
 
-    context "number after Company Reg No: 3736872" do
+    context "number after Company Reg No:" do
       let(:line) { "Company Reg No: #{number}" }
+      include_examples 'correct number'
+    end
+
+    context "number after England & Wales No." do
+      let(:line) { "Registered in England & Wales No. #{number}" }
+      include_examples 'correct number'
+    end
+
+    context 'reg no them company name' do
+      let(:line) { "Registration No. #{number}" }
+      include_examples 'correct number'
+    end
+
+    context 'after in England and Wales, company no.' do
+      let(:line) { "in England and Wales, company no. #{number}" }
       include_examples 'correct number'
     end
   end
@@ -105,6 +121,49 @@ describe Compdent::CopyrightParser do
       include_examples 'return nil'
     end
 
+		context 'company name ending in "Ltd"' do
+		  let(:name) { 'Acme Co Ltd' }
+  		let(:line) { "#{copyright_symbol} #{year} #{website_name} All Rights Reserved.\n#{name}. is authorised" }
+      include_examples 'correct name'
+    end
+
+    context 'company name ending in "(UK) Limited"' do
+		  let(:name) { 'Acme (UK) Limited' }
+  		let(:line) { "Brand Advertising\n#{copyright_symbol} #{year} #{name}" }
+      include_examples 'correct name'
+    end
+
+    context 'copyright symbol years' do
+      let(:line) { "Copyright #{copyright_symbol} 2009-2012" }
+      include_examples 'return nil'
+    end
+
+    context 'copyright symbol years' do
+      let(:line) { "Copyright #{copyright_symbol} 2009 - 2012 " }
+      include_examples 'return nil'
+    end
+
+    context 'reg no them company name' do
+      let(:line) { "Registration No. #{number}     #{copyright_symbol} #{year} #{name}. All Rights Reserved." }
+      include_examples 'correct name'
+    end
+
+    context 'after year-year' do
+      let(:line) { "#{copyright_symbol} 2003-#{year} #{name}" }
+      include_examples 'correct name'
+    end
+
+    context 'name between copyright symbol and year' do
+		  let(:name) { 'Acme (UK) Limited' }
+      let(:line) { "#{copyright_symbol} #{name} #{year} | Version 2.1.0.6" }
+      include_examples 'correct name'
+    end
+
+    context 'between symbol and year with preceeding text' do
+      let(:line) { "Important regulatory information and risk warnings
+      Copyright #{copyright_symbol} #{name} #{year}" }
+      include_examples 'correct name'
+    end
   end
 
 end

@@ -34,14 +34,24 @@ module Compdent
       @base_uri = URI(base_uri)
       html.gsub!('&nbsp;',' ')
       @doc = Nokogiri.HTML(html)
-      handle_anchors
       handle_paragraphs
+      handle_divs
+      handle_anchors
     end
 
     def handle_paragraphs
       @doc.search('p').each do |para|
-        @paragraph = para.inner_text
-        complete_paragraph
+        @text = para.inner_text
+        handle_text
+      end
+    end
+
+    def handle_divs
+      @doc.search('div').each do |div|
+        unless div.inner_html[/<(p|div)/]
+          @text = div.inner_text
+          handle_text
+        end
       end
     end
 
@@ -53,11 +63,11 @@ module Compdent
       end
     end
 
-    def complete_paragraph
-      escaped = URI.escape(@paragraph)
-      @paragraph = nil
+    def handle_text
+      escaped = URI.escape(@text)
 
       if escaped[COPYRIGHT_SYMBOL]
+        puts @text
         line = URI.unescape(escaped.sub(COPYRIGHT_SYMBOL,'&copy;'))
         copyright_line( line )
       end

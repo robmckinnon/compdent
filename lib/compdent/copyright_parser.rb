@@ -3,6 +3,7 @@ module Compdent
   # Find company name in copyright line
   class CopyrightParser
 
+    C = '&copy;'
     YEAR = '\d\d\d\d'
     NO = '[A-Z]?[A-Z]?\d+'
 
@@ -12,7 +13,9 @@ module Compdent
 
     def company_number
       case @line.cleaned
-      when /(?:Registered in England No|Company (?:registration|Reg) (?:number|No))\:?\s(#{NO})/i
+      when /(?:Registered (?:in England(?: & Wales)? )?No|(?:Company )?(?:registration|Reg) (?:number|No))(?:\:|\.)?\s(#{NO})/i
+        $1
+      when /company no\. (#{NO})/i
         $1
       when /registered in England and Wales with company registration numbers (#{NO}) & (#{NO})/
         [$1, $2]
@@ -26,14 +29,30 @@ module Compdent
       name ? name.split(/\s\|\s/).first : name
     end
 
+    NAME_MATCH = /((?:\w+\s)+)(\(\w+\)\s)?(Ltd|Limited)/
+
     def find_organisation_name
+      case @line.line
+      when /#{C}\s(.+)\s#{YEAR}/
+        name = $1
+        return name if @line.cleaned[/#{name}/] && !name[/#{YEAR}\s*-/]
+      else
+        nil
+      end
+
       case @line.cleaned
-      when /(.+)\s#{YEAR}(\s|$|\.)/
-        $1
-      when /#{YEAR}\s([^.]+)\.?/
+      when /(?:\.|#{YEAR})\s*#{NAME_MATCH}/
+        "#{$1}#{$2}#{$3}"
+      when /(#{NAME_MATCH})\s+#{YEAR}/
         $1
       when /^#{YEAR}$/
         nil
+      when /^\s*#{YEAR}\s*-\s*#{YEAR}\s*$/
+        nil
+      when /(?:\s|^)#{YEAR}(?:-#{YEAR})?\s([^.]+)\.?/
+        $1
+      when /(.+)\s#{YEAR}(\s|$|\.)/
+        $1
       when /(.+)/
         $1
       else
@@ -61,16 +80,20 @@ module Compdent
     end
 
     def cleaned
+      @cleaned_line
+    end
+
+    def line
       @line
     end
 
     def clean
-      @line.gsub!(/\s/,' ')
-      @line.squeeze!(' ')
-      @line.strip!
+      @cleaned_line = @line.gsub(/\s/,' ')
+      @cleaned_line.squeeze!(' ')
+      @cleaned_line.strip!
       # puts @line if @line.size > 0
 
-      TO_REMOVE.each {|remove| @line.sub!(remove,'') }
+      TO_REMOVE.each {|remove| @cleaned_line.sub!(remove,'') }
     end
 
   end

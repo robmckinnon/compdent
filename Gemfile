@@ -3,7 +3,8 @@ source 'https://rubygems.org'
 gem 'nokogiri'
 gem 'mongoid' # model and repository framework
 gem 'grackle' # wrapper around Twitter REST and Search APIs
-gem 'whois'
+gem 'morph'
+gem 'json'
 
 group :test do
   gem 'rspec'

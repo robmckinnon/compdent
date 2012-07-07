@@ -43,10 +43,7 @@ describe Compdent::PageParser do
     end
   end
 
-  context 'copywrite line' do
-    let(:line) { 'Copyright &copy; Acme Ltd 2007. All rights reserved. Registered in England No 0123456' }
-    let(:html) { %Q|<p class="floatl">#{line}</p>| }
-
+  shared_examples 'copywrite lines' do
     before do
       listener.stub(:copyright_company_number)
       listener.stub(:copyright_organisation_name)
@@ -73,6 +70,22 @@ describe Compdent::PageParser do
         listener.should_receive(:copyright_company_number).with('04252091').with('04252093').ordered
         do_parse
       end
+    end
+  end
+
+  context 'copywrite line' do
+    let(:line) { 'Copyright &copy; Acme Ltd 2007. All rights reserved. Registered in England No 0123456' }
+
+    context 'in paragraph' do
+      let(:html) { %Q|<p class="floatl">#{line}</p>| }
+
+      include_examples 'copywrite lines'
+    end
+
+    context 'in div' do
+      let(:html) { %Q|<div class="floatl">#{line}</div>| }
+
+      include_examples 'copywrite lines'
     end
   end
 
