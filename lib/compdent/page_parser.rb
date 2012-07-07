@@ -69,13 +69,12 @@ module Compdent
     end
 
     def handle_text
-      escaped = URI.escape(@text)
+      @escaped = URI.escape(@text)
 
-      if escaped[COPYRIGHT_SYMBOL]
-        escaped.sub!(COPYRIGHT_SYMBOL,'&copy;')
-        escaped.sub!(DASH,'-')
-        line = URI.unescape(escaped)
-        copyright_line( line )
+      if @escaped[COPYRIGHT_SYMBOL]
+        @escaped.sub!(COPYRIGHT_SYMBOL,'&copy;')
+        @escaped.sub!(DASH,'-')
+        copyright_line( URI.unescape(@escaped) )
       end
     end
 

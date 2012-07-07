@@ -9,9 +9,9 @@ module Compdent
     NO = '[A-Z]?[A-Z]?\d+'
 
     def initialize line
-      @line = CopyrightLine.new line
+      @line = CopyrightLine.new(line)
       first_line = line.split("\n").first.sub("\r",'')
-      @first_line = first_line[/#{C}/] ? CopyrightLine.new(first_line) : nil
+      @copyright_line = first_line[/#{C}/] ? CopyrightLine.new(first_line) : @line
     end
 
     def company_number
@@ -38,13 +38,13 @@ module Compdent
     def find_organisation_name
       name = @line.name_between_symbol_and_year
 
-      name = name ? name : find_organisation_name_from_cleaned_line(@first_line || @line)
+      name = name ? name : find_organisation_name_from_cleaned_line
 
       (name && name[/Web Design|document.write/i]) ? nil : name
     end
 
-    def find_organisation_name_from_cleaned_line line
-      case line.cleaned
+    def find_organisation_name_from_cleaned_line
+      case @copyright_line.cleaned
       when /#{YEAR}\s+(#{NAME_MATCH})/, /\.\s+(#{NAME_MATCH})/, /(#{NAME_MATCH})\s+#{YEAR}/
         $1
       when /^#{YEAR}$/, /^\s*#{YEAR}\s*-\s*#{YEAR}\s*$/
