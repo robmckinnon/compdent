@@ -66,6 +66,11 @@ describe Compdent::CopyrightParser do
       let(:line) { "in England and Wales, company no. #{number}" }
       include_examples 'correct number'
     end
+
+    context 'after Registered in England and Wales. No.' do
+      let(:line) { "Registered in England and Wales. No. #{number}" }
+      include_examples 'correct number'
+    end
   end
 
   describe "asked for organisation name" do
@@ -122,9 +127,15 @@ describe Compdent::CopyrightParser do
     end
 
 		context 'company name ending in "Ltd"' do
-		  let(:name) { 'Acme Co Ltd' }
-  		let(:line) { "#{copyright_symbol} #{year} #{website_name} All Rights Reserved.\n#{name}. is authorised" }
+		  let(:ltd_name) { 'Acme Co Ltd' }
+  		let(:line) { "#{copyright_symbol} #{year} #{website_name} All Rights Reserved.\n#{ltd_name}. is authorised" }
+		  let(:name) { website_name }
       include_examples 'correct name'
+    end
+
+    context "website ltd" do
+      let(:name) { "Acme.co.uk Limited"}
+      let(:line) { "#{copyright_symbol} #{year} #{name}. All Rights Reserved." }
     end
 
     context 'company name ending in "(UK) Limited"' do
@@ -173,6 +184,44 @@ describe Compdent::CopyrightParser do
     context 'web design line' do
       let(:line) { "#{copyright_symbol} All rights reserved. Web Design Cumbria by Wombat" }
       include_examples 'return nil'
+    end
+
+    context 'name before symbol and year with succeeding text' do
+      let(:line) { "#{name} #{copyright_symbol} #{year}\n\nUnlicensed Software" }
+      include_examples 'correct name'
+    end
+
+    context 'when dash in name' do
+      let(:name) { "Micro-Business Ltd" }
+      let(:line) { "#{name} #{copyright_symbol} #{year}-2011Privacy Policy" }
+      include_examples 'correct name'
+    end
+
+    context "followed by copyright and years" do
+      let(:line) { "#{name} #{copyright_symbol} #{year} – 2012" }
+      include_examples 'correct name'
+    end
+
+    context "dots in following" do
+      let(:line) { "#{copyright_symbol} #{year} #{name}. All Rights Reserved.Powered by WordPress." }
+      include_examples 'correct name'
+    end
+
+    context 'quote in name' do
+      let(:name) { "Acme's Supplies Ltd" }
+      let(:line) { "#{copyright_symbol} Copyright #{name} #{year}" }
+      include_examples 'correct name'
+    end
+
+    context 'comma after year' do
+      let(:line) { "#{copyright_symbol} Copyright 1998-#{year}, #{name}. All rights reserved." }
+      include_examples 'correct name'
+    end
+
+    context "year before ltd" do
+      let(:name) { 'Acme Limited' }
+      let(:line) { "Contact Us\nprovided by #{name}.  #{copyright_symbol} #{year} #{name} its affiliates and licensors" }
+      include_examples 'correct name'
     end
   end
 

@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Compdent
 
   # Find company name in copyright line
@@ -9,11 +10,13 @@ module Compdent
 
     def initialize line
       @line = CopyrightLine.new line
+      first_line = line.split("\n").first.sub("\r",'')
+      @first_line = first_line[/#{C}/] ? CopyrightLine.new(first_line) : nil
     end
 
     def company_number
       case @line.cleaned
-      when /(?:Registered (?:in England(?: & Wales)? )?No|(?:Company )?(?:registration|Reg) (?:number|No))(?:\:|\.)?\s(#{NO})/i
+      when /(?:Registered (?:in England(?: (?:&|and) Wales)?\.? )?No\.?|(?:Company )?(?:registration|Reg) (?:number|No))(?:\:|\.)?\s(#{NO})/i
         $1
       when /company no\. (#{NO})/i
         $1
@@ -29,24 +32,25 @@ module Compdent
       name ? name.split(/\s\|\s/).first : name
     end
 
-    NAME_MATCH = /((?:\w+\s)+)(\(\w+\)\s)?(Ltd|Limited)/
+    NAME = /(?:\w|-|')/
+    NAME_MATCH = /((?:#{NAME}+\s)+)(\(\w+\)\s)?(Ltd|Limited)/
 
     def find_organisation_name
       name = @line.name_between_symbol_and_year
 
-      name = name ? name : find_organisation_name_from_cleaned_line
+      name = name ? name : find_organisation_name_from_cleaned_line(@first_line || @line)
 
-      (name && name[/Web Design/i]) ? nil : name
+      (name && name[/Web Design|document.write/i]) ? nil : name
     end
 
-    def find_organisation_name_from_cleaned_line
-      case @line.cleaned
-      when /(?:\.|#{YEAR})\s*(#{NAME_MATCH})/, /(#{NAME_MATCH})\s+#{YEAR}/
+    def find_organisation_name_from_cleaned_line line
+      case line.cleaned
+      when /#{YEAR}\s+(#{NAME_MATCH})/, /\.\s+(#{NAME_MATCH})/, /(#{NAME_MATCH})\s+#{YEAR}/
         $1
       when /^#{YEAR}$/, /^\s*#{YEAR}\s*-\s*#{YEAR}\s*$/
         nil
-      when /(?:\s|^)#{YEAR}(?:-#{YEAR})?\s([^.]+)\.?/, /(.+)\s#{YEAR}(\s|$|\.)/, /(.+)/
-        $1
+      when /(?:\s|^)#{YEAR}(?:-\s*#{YEAR})?\,?\s([^-].+)\.?/, /(.+[^-])\s#{YEAR}(\s|$|\.)/, /(.+)/
+        $1.squeeze('.').chomp('.').split('. ').first.strip
       else
         nil
       end
@@ -69,7 +73,7 @@ module Compdent
       /#{C}/]
 
     def initialize line
-      @line = line
+      @line = line.gsub('–','-')
       clean
     end
 
@@ -83,11 +87,11 @@ module Compdent
 
     def clean
       @cleaned_line = @line.gsub(/\s/,' ')
-      @cleaned_line.squeeze!(' ')
-      @cleaned_line.strip!
       # puts @line if @line.size > 0
 
-      TO_REMOVE.each {|remove| @cleaned_line.sub!(remove,'') }
+      TO_REMOVE.each {|remove| @cleaned_line.sub!(remove,' ') }
+      @cleaned_line.squeeze!(' ')
+      @cleaned_line.strip!
     end
 
     def name_between_symbol_and_year
