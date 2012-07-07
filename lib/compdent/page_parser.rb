@@ -34,6 +34,10 @@ module Compdent
       @base_uri = URI(base_uri)
       html.gsub!('&nbsp;',' ')
       @doc = Nokogiri.HTML(html)
+      handle_content
+    end
+
+    def handle_content
       handle_paragraphs
       handle_divs
       handle_anchors

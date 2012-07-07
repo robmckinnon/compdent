@@ -32,28 +32,18 @@ module Compdent
     NAME_MATCH = /((?:\w+\s)+)(\(\w+\)\s)?(Ltd|Limited)/
 
     def find_organisation_name
-      case @line.line
-      when /#{C}\s(.+)\s#{YEAR}/
-        name = $1
-        return name if @line.cleaned[/#{name}/] && !name[/#{YEAR}\s*-/]
-      else
-        nil
-      end
+      name = @line.name_between_symbol_and_year
 
+      name ? name : find_organisation_name_from_cleaned_line
+    end
+
+    def find_organisation_name_from_cleaned_line
       case @line.cleaned
-      when /(?:\.|#{YEAR})\s*#{NAME_MATCH}/
-        "#{$1}#{$2}#{$3}"
-      when /(#{NAME_MATCH})\s+#{YEAR}/
+      when /(?:\.|#{YEAR})\s*(#{NAME_MATCH})/, /(#{NAME_MATCH})\s+#{YEAR}/
         $1
-      when /^#{YEAR}$/
+      when /^#{YEAR}$/, /^\s*#{YEAR}\s*-\s*#{YEAR}\s*$/
         nil
-      when /^\s*#{YEAR}\s*-\s*#{YEAR}\s*$/
-        nil
-      when /(?:\s|^)#{YEAR}(?:-#{YEAR})?\s([^.]+)\.?/
-        $1
-      when /(.+)\s#{YEAR}(\s|$|\.)/
-        $1
-      when /(.+)/
+      when /(?:\s|^)#{YEAR}(?:-#{YEAR})?\s([^.]+)\.?/, /(.+)\s#{YEAR}(\s|$|\.)/, /(.+)/
         $1
       else
         nil
@@ -66,6 +56,7 @@ module Compdent
   class CopyrightLine
 
     C = '&copy;'
+    YEAR = '\d\d\d\d'
 
     TO_REMOVE = ['Footer links ',
       /Copyright\sof\s|Copyright\sby\s|Copyright\s/,
@@ -94,6 +85,16 @@ module Compdent
       # puts @line if @line.size > 0
 
       TO_REMOVE.each {|remove| @cleaned_line.sub!(remove,'') }
+    end
+
+    def name_between_symbol_and_year
+      name = @line[/#{C}\s(.+)\s#{YEAR}/,1]
+
+      if name && @cleaned_line[/#{name}/] && !name[/#{YEAR}\s*-/]
+        name
+      else
+        nil
+      end
     end
 
   end
