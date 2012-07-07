@@ -34,7 +34,9 @@ module Compdent
     def find_organisation_name
       name = @line.name_between_symbol_and_year
 
-      name ? name : find_organisation_name_from_cleaned_line
+      name = name ? name : find_organisation_name_from_cleaned_line
+
+      (name && name[/Web Design/i]) ? nil : name
     end
 
     def find_organisation_name_from_cleaned_line
@@ -63,7 +65,8 @@ module Compdent
       /\sAll\srights\sreserved/i,
       /All\scontent\sis\s/,
       /#{C}\s/,
-      /\s#{C}/]
+      /\s#{C}/,
+      /#{C}/]
 
     def initialize line
       @line = line

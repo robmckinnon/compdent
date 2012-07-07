@@ -164,6 +164,16 @@ describe Compdent::CopyrightParser do
       Copyright #{copyright_symbol} #{name} #{year}" }
       include_examples 'correct name'
     end
+
+    context 'after symbolyear' do
+      let(:line) { "#{copyright_symbol}#{year} #{name}" }
+      include_examples 'correct name'
+    end
+
+    context 'web design line' do
+      let(:line) { "#{copyright_symbol} All rights reserved. Web Design Cumbria by Wombat" }
+      include_examples 'return nil'
+    end
   end
 
 end
