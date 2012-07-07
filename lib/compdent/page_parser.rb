@@ -25,6 +25,7 @@ module Compdent
   class PageParser
 
     COPYRIGHT_SYMBOL = /%C2%A9/
+    DASH = /%E2%80%93/
 
     def initialize listener
       @listener = listener
@@ -71,8 +72,9 @@ module Compdent
       escaped = URI.escape(@text)
 
       if escaped[COPYRIGHT_SYMBOL]
-        puts @text
-        line = URI.unescape(escaped.sub(COPYRIGHT_SYMBOL,'&copy;'))
+        escaped.sub!(COPYRIGHT_SYMBOL,'&copy;')
+        escaped.sub!(DASH,'-')
+        line = URI.unescape(escaped)
         copyright_line( line )
       end
     end

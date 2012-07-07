@@ -198,7 +198,7 @@ describe Compdent::CopyrightParser do
     end
 
     context "followed by copyright and years" do
-      let(:line) { "#{name} #{copyright_symbol} #{year} – 2012" }
+      let(:line) { "#{name} #{copyright_symbol} #{year} - 2012" }
       include_examples 'correct name'
     end
 

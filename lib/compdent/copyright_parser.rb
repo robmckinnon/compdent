@@ -73,7 +73,7 @@ module Compdent
       /#{C}/]
 
     def initialize line
-      @line = line.gsub('–','-')
+      @line = line
       clean
     end
 

@@ -50,7 +50,7 @@ describe Compdent::PageParser do
     end
 
     it 'should callback copyright_line' do
-      parser.should_receive(:copyright_line).with(line)
+      parser.should_receive(:copyright_line).with( line.sub('–','-') )
       do_parse
     end
 
@@ -74,7 +74,7 @@ describe Compdent::PageParser do
   end
 
   context 'copywrite line' do
-    let(:line) { 'Copyright &copy; Acme Ltd 2007. All rights reserved. Registered in England No 0123456' }
+    let(:line) { 'Copyright &copy; Acme Ltd 2007. All rights reserved – Registered in England No 0123456' }
 
     context 'in paragraph' do
       let(:html) { %Q|<p class="floatl">#{line}</p>| }
