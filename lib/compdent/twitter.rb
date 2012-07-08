@@ -2,8 +2,20 @@ module Compdent
 
   # API to Twitter
   class Twitter
+
     def initialize
-      @twitter = Grackle::Client.new
+      @twitter = if defined?(TWITTER_CONSUMER_KEY) && (ENV['MONGOID_ENV'] != 'test')
+        Grackle::Client.new(
+          :auth => {
+            :type => :oauth, :consumer_key => TWITTER_CONSUMER_KEY,
+            :consumer_secret => TWITTER_CONSUMER_SECRET,
+            :token => TWITTER_OAUTH_TOKEN,
+            :token_secret => TWITTER_OAUTH_SECRET_TOKEN
+          }
+        )
+      else
+        Grackle::Client.new
+      end
     end
 
     def following_ids screen_name
