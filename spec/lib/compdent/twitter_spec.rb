@@ -71,6 +71,7 @@ describe Twitter do
       context "and twitter response successful" do
 
         before do
+          Kernel.stub(:sleep)
           stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
             with(:body => {"user_id"=>"6253282,783214"}).
             to_return :body => %Q|[{
@@ -87,6 +88,11 @@ describe Twitter do
             }]|
         end
 
+        it 'should throttle using delay' do
+          Kernel.should_receive(:sleep).with(throttle_delay_in_seconds)
+          twitter.users_lookup(following_ids)
+        end
+
         subject { twitter.users_lookup(following_ids).first }
 
         its(:id) { should == first_id }
@@ -94,8 +100,19 @@ describe Twitter do
         its(:url) { should == first_url }
         its(:screen_name) { should == first_screen_name }
       end
-    end
 
+      context "and exception occurs" do
+        before do
+          stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
+            to_raise(StandardError)
+        end
+
+        it 'should sleep for recovery_delay_in_seconds' do
+          Kernel.should_receive(:sleep).with(recovery_delay_in_seconds)
+          twitter.users_lookup(following_ids).should == []
+        end
+      end
+    end
   end
 
 end

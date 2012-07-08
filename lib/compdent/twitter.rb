@@ -47,7 +47,14 @@ module Compdent
     end
 
     def users_lookup user_ids
-      @twitter.users.lookup!(:user_id => user_ids.join(','))
+      begin
+        items = @twitter.users.lookup!(:user_id => user_ids.join(','))
+        Kernel.sleep(@throttle_delay_in_seconds)
+        items
+      rescue Exception => exception
+        Kernel.sleep(@recovery_delay_in_seconds)
+        []
+      end
     end
   end
 end
