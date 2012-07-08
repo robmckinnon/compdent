@@ -22,18 +22,15 @@ module Compdent
       end
 
       def retrieve_following following_ids
-        following_ids.each do |id|
+        Tweeter.needs_update(following_ids).each do |tweeter|
+          @tweeter = tweeter
+          id = @tweeter.user_id
           unless @retrieved[id]
-            retrieve_from_id(id)
+            log
             @retrieved[id] = true
+            TwitterScraper.retrieve_from(:user_id => id)
           end
         end
-      end
-
-      def retrieve_from_id id
-        @tweeter = Tweeter.from_user_id(id)
-        log
-        TwitterScraper.retrieve_from(:user_id => @tweeter.user_id) if @tweeter.has_co_uk_url?
       end
 
       def log
@@ -58,7 +55,7 @@ module Compdent
         @tweeter.following_ids = @twitter.following_ids(@options)
 
         if @tweeter.following_ids_changed?
-          retrieve_following(following_ids)
+          retrieve_following(@tweeter.following_ids)
           @tweeter.save
         end
       end

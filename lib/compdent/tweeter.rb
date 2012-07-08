@@ -31,6 +31,10 @@ module Compdent
         find_or_create_by(:user_id => user_id)
       end
 
+      def needs_update following_ids
+        where( :url => /co.uk(\/|$)/, :following_ids => nil ).in( :user_id => following_ids)
+      end
+
     end
 
     def update_data data

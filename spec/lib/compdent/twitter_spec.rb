@@ -35,12 +35,12 @@ describe Twitter do
         end
 
         it 'should return following ids' do
-          twitter.following_ids(screen_name).should == following_ids
+          twitter.following_ids(:screen_name => screen_name).should == following_ids
         end
 
         it 'should throttle using delay' do
           Kernel.should_receive(:sleep).with(throttle_delay_in_seconds)
-          twitter.following_ids(screen_name)
+          twitter.following_ids(:screen_name => screen_name)
         end
       end
 
@@ -54,7 +54,7 @@ describe Twitter do
           @twitter.should_receive(:friends).and_raise(StandardError)
           Kernel.should_receive(:sleep).with(throttle_delay_in_seconds).ordered
           Kernel.should_receive(:sleep).with(recovery_delay_in_seconds).ordered
-          twitter.following_ids(screen_name).should == []
+          twitter.following_ids(:screen_name => screen_name).should == []
         end
       end
     end

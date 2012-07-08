@@ -21,8 +21,8 @@ module Compdent
       end
     end
 
-    def following_ids screen_name
-      perform { @twitter.friends.ids?(:screen_name => screen_name).ids }
+    def following_ids options
+      perform { @twitter.friends.ids?(options).ids }
     end
 
     def each_lookup following_ids, &block
