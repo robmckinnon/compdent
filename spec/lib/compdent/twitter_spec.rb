@@ -6,7 +6,8 @@ describe Twitter do
 
   let(:screen_name) { 'tweeter' }
 
-  let(:twitter) { Twitter.new }
+  let(:recovery_delay_in_seconds) { 0 }
+  let(:twitter) { Twitter.new(recovery_delay_in_seconds) }
 
   context 'tweeter follows other tweeters' do
 
@@ -16,36 +17,23 @@ describe Twitter do
     let(:first_screen_name) { 'twitterapi' }
     let(:following_ids) { [first_id, 783214] }
 
-    before do
-      stub_http_request(:get, "api.twitter.com/1/friends/ids.json").
-        with(:query => { 'screen_name' => 'tweeter'}).
-        to_return :body => '{
-          "previous_cursor_str":"0",
-          "next_cursor":0,
-          "ids":[6253282,783214]
-          ,"previous_cursor":0,
-          "next_cursor_str":"0"
-        }'
-
-      stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
-        with(:body => {"user_id"=>"6253282,783214"}).
-        to_return :body => %Q|[{
-        "name": "#{first_name}",
-        "url": "#{first_url}",
-        "id": #{first_id},
-        "screen_name": "#{first_screen_name}"
-        },
-        {
-        "name": "Twitter",
-        "url": "http://twitter.com",
-        "id": 783214,
-        "screen_name": "twitter"
-        }]|
-    end
-
     describe "asked for following_ids given screen_name" do
-      it 'should return following ids' do
-        twitter.following_ids(screen_name).should == following_ids
+      before do
+        stub_http_request(:get, "api.twitter.com/1/friends/ids.json").
+          with(:query => { 'screen_name' => 'tweeter'}).
+          to_return :body => '{
+            "previous_cursor_str":"0",
+            "next_cursor":0,
+            "ids":[6253282,783214]
+            ,"previous_cursor":0,
+            "next_cursor_str":"0"
+          }'
+      end
+
+      context "and twitter response succeeds" do
+        it 'should return following ids' do
+          twitter.following_ids(screen_name).should == following_ids
+        end
       end
     end
 
@@ -59,12 +47,33 @@ describe Twitter do
     end
 
     describe "users_lookup" do
-      subject { twitter.users_lookup(following_ids).first }
 
-      its(:id) { should == first_id }
-      its(:name) { should == first_name }
-      its(:url) { should == first_url }
-      its(:screen_name) { should == first_screen_name }
+      context "and twitter response successful" do
+
+        before do
+          stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
+            with(:body => {"user_id"=>"6253282,783214"}).
+            to_return :body => %Q|[{
+            "name": "#{first_name}",
+            "url": "#{first_url}",
+            "id": #{first_id},
+            "screen_name": "#{first_screen_name}"
+            },
+            {
+            "name": "Twitter",
+            "url": "http://twitter.com",
+            "id": 783214,
+            "screen_name": "twitter"
+            }]|
+        end
+
+        subject { twitter.users_lookup(following_ids).first }
+
+        its(:id) { should == first_id }
+        its(:name) { should == first_name }
+        its(:url) { should == first_url }
+        its(:screen_name) { should == first_screen_name }
+      end
     end
 
   end

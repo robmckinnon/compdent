@@ -3,7 +3,9 @@ module Compdent
   # API to Twitter
   class Twitter
 
-    def initialize
+    def initialize recovery_delay_in_seconds
+      @recovery_delay_in_seconds = recovery_delay_in_seconds
+
       @twitter = if defined?(TWITTER_CONSUMER_KEY) && (ENV['MONGOID_ENV'] != 'test')
         Grackle::Client.new(
           :auth => {
