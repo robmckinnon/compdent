@@ -3,6 +3,8 @@ require 'mongoid'
 module Compdent
 end
 
+require File.dirname(__FILE__) + '/config.rb' if File.exist?(File.dirname(__FILE__) + '/config.rb')
+
 require File.dirname(__FILE__) + '/compdent/copyright_parser'
 require File.dirname(__FILE__) + '/compdent/page_parser'
 require File.dirname(__FILE__) + '/compdent/uri_scraper'

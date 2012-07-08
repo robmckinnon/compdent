@@ -1,6 +1,8 @@
-ENV['MONGOID_ENV'] = 'test'
 
+ENV['MONGOID_ENV'] = 'test'
 require File.dirname(__FILE__) + '/../lib/compdent'
+
+TWITTER_CONSUMER_KEY = nil
 
 require 'webmock/rspec' # mock http responses
 
