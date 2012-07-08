@@ -4,8 +4,10 @@ include Compdent
 
 describe TwitterScraper do
 
+  let(:user_id) { 123 }
   let(:screen_name) { 'tweeter' }
-  let(:scraper) { TwitterScraper.new(screen_name) }
+  let(:create_options) { { :screen_name => screen_name } }
+  let(:scraper) { TwitterScraper.new(create_options) }
   let(:twitter) { mock('twitter') }
   let(:following_ids) { [6253282,783214] }
 
@@ -13,9 +15,30 @@ describe TwitterScraper do
     Twitter.stub(:new).and_return twitter
   end
 
+  describe "creating from screen_name" do
+    it 'should create tweeter' do
+      Tweeter.should_receive(:from_screen_name).with(screen_name)
+      scraper
+    end
+  end
+
+  describe "creating from user_id" do
+    let(:create_options) { { :user_id => user_id } }
+
+    it 'should create tweeter' do
+      Tweeter.should_receive(:from_user_id).with(user_id)
+      scraper
+    end
+  end
+
   describe "asked to retrieve by screen_name" do
 
-    let(:tweeter) { mock('tweeter', :following_ids => following_ids, :following_ids_changed? => false) }
+    let(:tweeter) do
+      mock('tweeter',
+        :screen_name => screen_name,
+        :following_ids => following_ids,
+        :following_ids_changed? => false)
+    end
 
     before do
       twitter.stub(:following_ids).and_return following_ids
@@ -36,6 +59,7 @@ describe TwitterScraper do
 
     context 'following_ids are new' do
       before do
+        tweeter.stub(:following_ids).and_return(nil, following_ids)
         tweeter.stub(:following_ids_changed?).and_return true
         tweeter.stub(:save)
         scraper.stub(:retrieve_following)

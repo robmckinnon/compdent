@@ -5,22 +5,50 @@ module Compdent
   # Scrapes Twitter account information
   class TwitterScraper
 
-    def initialize screen_name
-      @screen_name = screen_name
-      @twitter = Twitter.new
+    class << self
+      def retrieve options
+        @retrieving ||= {}
+        return if @retrieving[options]
+
+        @retrieving[options] = true
+        @retrieved ||= {}
+
+        tweeter = TwitterScraper.new(options).retrieve
+        puts tweeter.screen_name + " --- " + tweeter.url.to_s
+
+        tweeter.following_ids.reverse.each do |id|
+          unless @retrieved[id]
+            tweeter = Tweeter.from_user_id(id)
+            if tweeter.url && tweeter.url[/co.uk/]
+              TwitterScraper.retrieve :user_id => id
+            end
+            @retrieved[id] = true
+          end
+        end
+      end
+    end
+
+    def initialize options
+      @tweeter = if options[:screen_name]
+                   Tweeter.from_screen_name(options[:screen_name])
+                 else
+                   Tweeter.from_user_id(options[:user_id])
+                 end
+      @twitter = Twitter.new(3, 5 * 60)
+      @options = options
     end
 
     def retrieve
-      tweeter = Tweeter.from_screen_name(@screen_name)
+      if @tweeter.following_ids.nil?
+        @tweeter.following_ids = @twitter.following_ids(@options)
 
-      tweeter.following_ids = @twitter.following_ids(@screen_name)
+        if @tweeter.following_ids_changed?
+          retrieve_following(@tweeter.following_ids)
+          @tweeter.save
+        end
 
-      if tweeter.following_ids_changed?
-        retrieve_following(tweeter.following_ids)
-        tweeter.save
+        @tweeter
       end
-
-      tweeter
     end
 
     def retrieve_following following_ids
@@ -29,7 +57,10 @@ module Compdent
       @twitter.each_lookup(ids) do |data|
         tweeter = Tweeter.from_user_id data.id
         tweeter.update_data data
+        puts "  " + tweeter.screen_name + " --- " + tweeter.url.to_s unless (ENV['MONGOID_ENV'] == 'test')
+        nil
       end
+      nil
     end
   end
 
