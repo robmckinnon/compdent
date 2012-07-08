@@ -14,3 +14,4 @@ require 'grackle'
 
 ENV['MONGOID_ENV'] ||= 'development'
 Mongoid.load!( File.dirname(__FILE__) + "/../config/mongoid.yml")
+require File.dirname(__FILE__) + "/../config/twitter" if File.exist?(File.dirname(__FILE__) + "/../config/twitter.rb")

@@ -1,0 +1,5 @@
+TWITTER_CONSUMER_KEY='your-key'
+TWITTER_CONSUMER_SECRET='your-secret'
+TWITTER_OAUTH_TOKEN='your-token'
+TWITTER_OAUTH_SECRET_TOKEN='your-secret-token'
+
