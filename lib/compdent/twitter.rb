@@ -51,6 +51,7 @@ module Compdent
         Kernel.sleep(@throttle_delay_in_seconds)
         items
       rescue Exception => exception
+        puts exception.to_s unless (ENV['MONGOID_ENV'] == 'test')
         Kernel.sleep(@recovery_delay_in_seconds)
         []
       end

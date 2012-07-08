@@ -46,11 +46,12 @@ describe Twitter do
 
       context "and exception occurs" do
         before do
-          stub_request(:get, "http://api.twitter.com/1/friends/ids.json?screen_name=tweeter").
-            to_raise(StandardError)
+          @twitter = mock
+          Grackle::Client.stub(:new).and_return @twitter
         end
 
         it 'should sleep for recovery_delay_in_seconds' do
+          @twitter.should_receive(:friends).and_raise(StandardError)
           Kernel.should_receive(:sleep).with(recovery_delay_in_seconds)
           twitter.following_ids(screen_name).should == []
         end
@@ -103,11 +104,12 @@ describe Twitter do
 
       context "and exception occurs" do
         before do
-          stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
-            to_raise(StandardError)
+          @twitter = mock
+          Grackle::Client.stub(:new).and_return @twitter
         end
 
         it 'should sleep for recovery_delay_in_seconds' do
+          @twitter.should_receive(:users).and_raise(StandardError)
           Kernel.should_receive(:sleep).with(recovery_delay_in_seconds)
           twitter.users_lookup(following_ids).should == []
         end
