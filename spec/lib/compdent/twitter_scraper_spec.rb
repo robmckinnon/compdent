@@ -41,6 +41,7 @@ describe TwitterScraper do
     end
 
     before do
+      tweeter.stub(:has_following_ids?).and_return(false)
       twitter.stub(:following_ids).and_return following_ids
       Tweeter.stub(:from_screen_name).and_return tweeter
       tweeter.stub(:following_ids=)
@@ -59,7 +60,7 @@ describe TwitterScraper do
 
     context 'following_ids are new' do
       before do
-        tweeter.stub(:following_ids).and_return(nil, following_ids)
+        tweeter.stub(:has_following_ids?).and_return(false)
         tweeter.stub(:following_ids_changed?).and_return true
         tweeter.stub(:save)
         scraper.stub(:retrieve_following)

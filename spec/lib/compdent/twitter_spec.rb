@@ -52,7 +52,8 @@ describe Twitter do
 
         it 'should sleep for recovery_delay_in_seconds' do
           @twitter.should_receive(:friends).and_raise(StandardError)
-          Kernel.should_receive(:sleep).with(recovery_delay_in_seconds)
+          Kernel.should_receive(:sleep).with(throttle_delay_in_seconds).ordered
+          Kernel.should_receive(:sleep).with(recovery_delay_in_seconds).ordered
           twitter.following_ids(screen_name).should == []
         end
       end
@@ -110,7 +111,8 @@ describe Twitter do
 
         it 'should sleep for recovery_delay_in_seconds' do
           @twitter.should_receive(:users).and_raise(StandardError)
-          Kernel.should_receive(:sleep).with(recovery_delay_in_seconds)
+          Kernel.should_receive(:sleep).with(throttle_delay_in_seconds).ordered
+          Kernel.should_receive(:sleep).with(recovery_delay_in_seconds).ordered
           twitter.users_lookup(following_ids).should == []
         end
       end

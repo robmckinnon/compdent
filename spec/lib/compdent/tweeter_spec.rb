@@ -31,6 +31,10 @@ describe TwitterScraper do
       Tweeter.find_by(:screen_name => screen_name).should == tweeter
       Tweeter.delete_all
     end
+
+    it 'should return true for no_following_ids?' do
+      Tweeter.from_screen_name(screen_name).has_following_ids?.should be_false
+    end
   end
 
   describe 'from_user_id' do
@@ -64,5 +68,13 @@ describe TwitterScraper do
     its(:url) { should == url}
     its(:screen_name) { should == screen_name}
     its(:name) { should == name}
+
+    its(:has_co_uk_url?) { should be_false }
+
+    context 'co.uk url' do
+      let(:url) { "http://twitter.co.uk" }
+      subject { tweeter.update_data(data) ; Tweeter.from_user_id(user_id) }
+      its(:has_co_uk_url?) { should be_true }
+    end
   end
 end

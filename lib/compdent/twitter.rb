@@ -47,9 +47,8 @@ module Compdent
 
     def perform
       begin
-        items = yield
         Kernel.sleep(@throttle_delay_in_seconds)
-        items
+        yield
       rescue Exception => exception
         puts exception.to_s unless (ENV['MONGOID_ENV'] == 'test')
         Kernel.sleep(@recovery_delay_in_seconds)
