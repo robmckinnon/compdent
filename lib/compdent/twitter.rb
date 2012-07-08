@@ -22,14 +22,7 @@ module Compdent
     end
 
     def following_ids screen_name
-      begin
-        result = @twitter.friends.ids?(:screen_name => screen_name)
-        Kernel.sleep(@throttle_delay_in_seconds)
-        result.ids
-      rescue Exception => exception
-        Kernel.sleep(@recovery_delay_in_seconds)
-        []
-      end
+      perform { @twitter.friends.ids?(:screen_name => screen_name).ids }
     end
 
     def each_lookup following_ids, &block
@@ -47,8 +40,14 @@ module Compdent
     end
 
     def users_lookup user_ids
+      perform { @twitter.users.lookup!(:user_id => user_ids.join(',')) }
+    end
+
+    protected
+
+    def perform
       begin
-        items = @twitter.users.lookup!(:user_id => user_ids.join(','))
+        items = yield
         Kernel.sleep(@throttle_delay_in_seconds)
         items
       rescue Exception => exception
@@ -56,5 +55,7 @@ module Compdent
         []
       end
     end
+
   end
+
 end
