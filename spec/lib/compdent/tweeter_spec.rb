@@ -28,13 +28,11 @@ describe TwitterScraper do
 
     it 'should persist tweeter' do # tests mongoid
       tweeter = Tweeter.from_screen_name(screen_name)
+      tweeter.has_following_ids?.should be_false
       Tweeter.find_by(:screen_name => screen_name).should == tweeter
       Tweeter.delete_all
     end
 
-    it 'should return true for no_following_ids?' do
-      Tweeter.from_screen_name(screen_name).has_following_ids?.should be_false
-    end
   end
 
   describe 'from_user_id' do
