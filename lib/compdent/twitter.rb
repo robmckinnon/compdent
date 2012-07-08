@@ -3,7 +3,8 @@ module Compdent
   # API to Twitter
   class Twitter
 
-    def initialize recovery_delay_in_seconds
+    def initialize throttle_delay_in_seconds, recovery_delay_in_seconds
+      @throttle_delay_in_seconds = throttle_delay_in_seconds
       @recovery_delay_in_seconds = recovery_delay_in_seconds
 
       @twitter = if defined?(TWITTER_CONSUMER_KEY) && (ENV['MONGOID_ENV'] != 'test')
@@ -21,8 +22,14 @@ module Compdent
     end
 
     def following_ids screen_name
-      result = @twitter.friends.ids?(:screen_name => screen_name)
-      result.ids
+      begin
+        result = @twitter.friends.ids?(:screen_name => screen_name)
+        Kernel.sleep(@throttle_delay_in_seconds)
+        result.ids
+      rescue Exception => exception
+        Kernel.sleep(@recovery_delay_in_seconds)
+        []
+      end
     end
 
     def each_lookup following_ids, &block

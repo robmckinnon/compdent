@@ -6,8 +6,9 @@ describe Twitter do
 
   let(:screen_name) { 'tweeter' }
 
-  let(:recovery_delay_in_seconds) { 0 }
-  let(:twitter) { Twitter.new(recovery_delay_in_seconds) }
+  let(:recovery_delay_in_seconds) { mock('delay') }
+  let(:throttle_delay_in_seconds) { mock('throttle') }
+  let(:twitter) { Twitter.new(throttle_delay_in_seconds, recovery_delay_in_seconds) }
 
   context 'tweeter follows other tweeters' do
 
@@ -18,21 +19,40 @@ describe Twitter do
     let(:following_ids) { [first_id, 783214] }
 
     describe "asked for following_ids given screen_name" do
-      before do
-        stub_http_request(:get, "api.twitter.com/1/friends/ids.json").
-          with(:query => { 'screen_name' => 'tweeter'}).
-          to_return :body => '{
-            "previous_cursor_str":"0",
-            "next_cursor":0,
-            "ids":[6253282,783214]
-            ,"previous_cursor":0,
-            "next_cursor_str":"0"
-          }'
-      end
 
       context "and twitter response succeeds" do
+        before do
+          Kernel.stub(:sleep)
+          stub_http_request(:get, "api.twitter.com/1/friends/ids.json").
+            with(:query => { 'screen_name' => 'tweeter'}).
+            to_return :body => '{
+              "previous_cursor_str":"0",
+              "next_cursor":0,
+              "ids":[6253282,783214]
+              ,"previous_cursor":0,
+              "next_cursor_str":"0"
+            }'
+        end
+
         it 'should return following ids' do
           twitter.following_ids(screen_name).should == following_ids
+        end
+
+        it 'should throttle using delay' do
+          Kernel.should_receive(:sleep).with(throttle_delay_in_seconds)
+          twitter.following_ids(screen_name)
+        end
+      end
+
+      context "and exception occurs" do
+        before do
+          stub_request(:get, "http://api.twitter.com/1/friends/ids.json?screen_name=tweeter").
+            to_raise(StandardError)
+        end
+
+        it 'should sleep for recovery_delay_in_seconds' do
+          Kernel.should_receive(:sleep).with(recovery_delay_in_seconds)
+          twitter.following_ids(screen_name).should == []
         end
       end
     end
