@@ -94,8 +94,8 @@ describe TwitterScraper do
     end
 
     it 'should update data on Tweeter' do
-      Tweeter.should_receive(:from_user_id).with(user_id).and_return tweeter
       tweeter.should_receive(:update_data).with(data)
+      Tweeter.should_receive(:from_user_id).with(user_id).and_return tweeter
       scraper.retrieve_following following_ids
     end
   end
