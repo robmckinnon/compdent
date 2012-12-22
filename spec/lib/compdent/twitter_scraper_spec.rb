@@ -91,7 +91,6 @@ describe TwitterScraper do
 
     before do
       twitter.stub(:each_lookup).and_yield data
-      Tweeter.stub(:from_user_id).and_return tweeter
     end
 
     it 'should update data on Tweeter' do
