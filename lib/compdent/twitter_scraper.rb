@@ -22,6 +22,7 @@ module Compdent
       end
 
       def retrieve_following following_ids
+
         Tweeter.needs_update(following_ids).each do |tweeter|
           @tweeter = tweeter
           id = @tweeter.user_id
