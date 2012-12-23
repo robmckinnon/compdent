@@ -17,7 +17,7 @@ describe UriScraper do
   describe 'asked to get_response_body with uri' do
 
     let(:uri) { 'http://example.com/' }
-    let(:body) { mock }
+    let(:body) { 'content' }
     let(:sleep_on_timeout) { 0 }
 
     context 'when response is success' do

@@ -22,14 +22,21 @@ module Compdent
       def from_uri uri
         page = find_or_create_by(:uri => canonical_uri(uri))
         page.retrieve_content
-        puts uri if page.content
         page
       end
     end
 
     def retrieve_content
       if content_to_retrieve? && (body = UriScraper.get_response_body(uri))
-        update_attribute(:content, body) if body.size > 0
+        begin
+          if body.size > 0
+            update_attribute(:content, body)
+            puts uri if content
+          end
+        rescue Exception => e
+          puts e.to_s
+          puts e.backtrace.join("\n")
+        end
       end
     end
 

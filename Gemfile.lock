@@ -12,6 +12,7 @@ GEM
     arrayfields (4.7.4)
     awesome_print (1.0.2)
     builder (3.0.4)
+    charlock_holmes (0.6.9)
     chronic (0.3.0)
     churn (0.0.13)
       chronic (>= 0.2.3)
@@ -133,6 +134,7 @@ PLATFORMS
 
 DEPENDENCIES
   arrayfields
+  charlock_holmes
   fattr
   grackle
   guard-rspec
