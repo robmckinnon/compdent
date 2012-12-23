@@ -20,21 +20,27 @@ module Compdent
       end
 
       def from_uri uri
-        uri = Uri.new(uri)
-
-        page = find_or_create_by(:uri => uri.canonical)
-
-        if uri.host_uri? && page.content.nil?
-          content = UriScraper.get_response_body(uri.canonical)
-          if content && content.size > 0
-            puts uri.canonical
-            page.content = content
-            page.save
-          end
-        end
+        page = find_or_create_by(:uri => canonical_uri(uri))
+        page.retrieve_content
+        puts uri if page.content
         page
       end
+    end
 
+    def retrieve_content
+      if content_to_retrieve? && (body = UriScraper.get_response_body(uri))
+        update_attribute(:content, body) if body.size > 0
+      end
+    end
+
+    private
+
+    def content_to_retrieve?
+      host_uri? && content.nil?
+    end
+
+    def host_uri?
+      Uri.new(uri).host_uri?
     end
   end
 
@@ -46,15 +52,18 @@ module Compdent
 
     def canonical
       if @uri.path == ""
-        query = @uri.query
-        "#{@uri.scheme}://#{@uri.host}/#{query ? '?' + query : ''}"
+        if @uri.query
+          "#{@uri.scheme}://#{@uri.host}/?#{@uri.query}"
+        else
+          "#{@uri.scheme}://#{@uri.host}/"
+        end
       else
         @uri.to_s
       end
     end
 
     def host_uri?
-      @uri.path == '' && @uri.query == nil
+      (@uri.path == '' || @uri.path == '/') && @uri.query == nil
     end
   end
 
