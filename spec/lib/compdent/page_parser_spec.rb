@@ -13,7 +13,7 @@ describe Compdent::PageParser do
   def do_parse
     parser.parse(html, base_uri)
   end
-
+=begin
   context 'Contact Us link in page' do
     let(:html) { "<a href='#{uri}'>Contact us</a>" }
     let(:uri_path) { 'contact-us' }
@@ -42,7 +42,7 @@ describe Compdent::PageParser do
       do_parse
     end
   end
-
+=end
   shared_examples 'copywrite lines' do
     before do
       listener.stub(:copyright_company_number)

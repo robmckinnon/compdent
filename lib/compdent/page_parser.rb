@@ -41,7 +41,7 @@ module Compdent
     def handle_content
       handle_paragraphs
       handle_divs
-      handle_anchors
+      # handle_anchors
     end
 
     def handle_paragraphs
