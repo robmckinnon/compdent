@@ -5,6 +5,7 @@ gem 'mongoid' # model and repository framework
 gem 'grackle' # wrapper around Twitter REST and Search APIs
 gem 'morph'
 gem 'json'
+gem 'url_expander'
 
 # bundle config build.charlock_holmes --with-icu-dir=/path/to/installed/icu4c
 gem 'charlock_holmes'
