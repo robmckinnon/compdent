@@ -71,6 +71,11 @@ describe Compdent::CopyrightParser do
       let(:line) { "Registered in England and Wales. No. #{number}" }
       include_examples 'correct number'
     end
+
+    context 'after company number' do
+      let(:line) { "Loaf Social Enterprise Ltd (company number #{number})" }
+      include_examples 'correct number'
+    end
   end
 
   describe "asked for organisation name" do
@@ -223,6 +228,7 @@ describe Compdent::CopyrightParser do
       let(:line) { "Contact Us\nprovided by #{name}.  #{copyright_symbol} #{year} #{name} its affiliates and licensors" }
       include_examples 'correct name'
     end
+
   end
 
 end
