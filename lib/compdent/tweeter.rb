@@ -1,5 +1,5 @@
 require 'active_support/core_ext/array/grouping'
-
+require 'url_expander'
 module Compdent
 
   # represents Twitter account information
@@ -32,7 +32,14 @@ module Compdent
       end
 
       def needs_update following_ids
-        where( :url => /co.uk(\/|$)/, :following_ids => nil ).in( :user_id => following_ids)
+        following_ids.map do |id|
+          tweeter = where(user_id: id).first
+          if tweeter && tweeter.url && tweeter.url[/co.uk(\/|$)/] && tweeter.following_ids.nil?
+            tweeter
+          else
+            nil
+          end
+        end.compact
       end
 
     end
@@ -58,9 +65,16 @@ module Compdent
     end
 
     def hash
+      begin
+        url = @data.url.blank? ? nil : UrlExpander::Client.expand(@data.url)
+      rescue Exception => e
+        puts e.to_s
+        puts @data.url
+        url = @data.url
+      end
       { :name => @data.name,
         :screen_name => @data.screen_name,
-        :url => @data.url }
+        :url => url }
     end
   end
 end
