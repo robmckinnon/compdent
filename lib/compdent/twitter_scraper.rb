@@ -6,6 +6,7 @@ module Compdent
   class TwitterScraper
 
     class << self
+
       def setup
         @retrieving ||= {}
         @retrieved ||= {}
@@ -22,8 +23,9 @@ module Compdent
       end
 
       def retrieve_following following_ids
-
-        Tweeter.needs_update(following_ids).each do |tweeter|
+        puts "following_ids: #{following_ids}" unless (ENV['MONGOID_ENV'] == 'test')
+        to_update = Tweeter.needs_update(following_ids)
+        to_update.each do |tweeter|
           @tweeter = tweeter
           id = @tweeter.user_id
           unless @retrieved[id]
@@ -35,7 +37,7 @@ module Compdent
       end
 
       def log
-        puts "#{@tweeter.screen_name} --- #{@tweeter.url.to_s}" unless (ENV['MONGOID_ENV'] == 'test')
+        puts "#{@tweeter.screen_name} --- #{@tweeter.url.to_s} --- #{@tweeter.user_id}" unless (ENV['MONGOID_ENV'] == 'test')
       end
     end
 
