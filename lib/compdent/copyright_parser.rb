@@ -16,7 +16,7 @@ module Compdent
 
     def company_number
       case @line.cleaned
-      when /(?:Registered (?:in England(?: (?:&|and) Wales)?\.? )?No\.?|(?:Company )?(?:registration|Reg) (?:number|No))(?:\:|\.)?\s(#{NO})/i
+      when /(?:Registered (?:in England(?: (?:&|and) Wales)?\.? )?No\.?|(?:Company )?(?:registration|Reg|company) (?:number|No))(?:\:|\.)?\s(#{NO})/i
         $1
       when /company no\. (#{NO})/i
         $1
@@ -50,7 +50,7 @@ module Compdent
       when /^#{YEAR}$/, /^\s*#{YEAR}\s*-\s*#{YEAR}\s*$/
         nil
       when /(?:\s|^)#{YEAR}(?:-\s*#{YEAR})?\,?\s([^-].+)\.?/, /(.+[^-])\s#{YEAR}(\s|$|\.)/, /(.+)/
-        $1.squeeze('.').chomp('.').split('. ').first.strip
+        $1.squeeze('.').chomp('.').split('. ').first.try(:strip)
       else
         nil
       end
@@ -97,8 +97,20 @@ module Compdent
     def name_between_symbol_and_year
       name = @line[/#{C}\s(.+)\s#{YEAR}/,1]
 
-      if name && @cleaned_line[/#{name}/] && !name[/#{YEAR}\s*-/]
-        name
+
+      if name
+        sanitized_name = name.gsub("/t",' ').tr('(','').tr('(','').tr('/','')
+
+        begin
+          if @cleaned_line[/#{sanitized_name}/] && !sanitized_name[/#{YEAR}\s*-/]
+            name
+          else
+            nil
+          end
+        rescue
+          puts sanitized_name
+          nil
+        end
       else
         nil
       end
