@@ -57,8 +57,8 @@ module UriScraper
 
   def convert_response content
     if defined?(CharlockHolmes) || (require 'charlock_holmes')
-      @detector ||= CharlockHolmes::EncodingDetector.new
-      detection = @detector.detect(content)
+      detector = CharlockHolmes::EncodingDetector.new
+      detection = detector.detect(content)
       unless detection[:encoding] == 'UTF-8'
         content = CharlockHolmes::Converter.convert content, detection[:encoding], 'UTF-8'
       end
