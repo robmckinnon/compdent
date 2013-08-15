@@ -23,7 +23,7 @@ describe Twitter do
       context "and twitter response succeeds" do
         before do
           Kernel.stub(:sleep)
-          stub_http_request(:get, "api.twitter.com/1/friends/ids.json").
+          stub_http_request(:get, "api.twitter.com/1.1/friends/ids.json").
             with(:query => { 'screen_name' => 'tweeter'}).
             to_return :body => '{
               "previous_cursor_str":"0",
@@ -74,7 +74,7 @@ describe Twitter do
 
         before do
           Kernel.stub(:sleep)
-          stub_request(:post, "http://api.twitter.com/1/users/lookup.json").
+          stub_request(:post, "http://api.twitter.com/1.1/users/lookup.json").
             with(:body => {"user_id"=>"6253282,783214"}).
             to_return :body => %Q|[{
             "name": "#{first_name}",
