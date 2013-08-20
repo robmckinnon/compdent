@@ -12,7 +12,7 @@ gem 'charlock_holmes'
 
 group :test do
   gem 'rspec'
-  gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
+  gem 'rb-fsevent' #, :require => false if RUBY_PLATFORM =~ /darwin/i
   gem 'guard-rspec'
   gem 'webmock'
 end
