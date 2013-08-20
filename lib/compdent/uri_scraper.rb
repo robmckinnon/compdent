@@ -56,11 +56,16 @@ module UriScraper
   end
 
   def convert_response content
-    if defined?(CharlockHolmes) || (require 'charlock_holmes')
+    if content.present? && ( defined?(CharlockHolmes) || (require 'charlock_holmes') )
       detector = CharlockHolmes::EncodingDetector.new
-      detection = detector.detect(content)
-      unless detection[:encoding] == 'UTF-8'
-        content = CharlockHolmes::Converter.convert content, detection[:encoding], 'UTF-8'
+      begin
+        detection = detector.detect(content)
+        unless detection[:encoding].blank? || ( detection[:encoding] == 'UTF-8' )
+          puts '   encoding: ' + detection[:encoding].to_s
+          content = CharlockHolmes::Converter.convert content, detection[:encoding], 'UTF-8'
+        end
+      rescue Exception => e
+        puts e.to_s
       end
     end
     content
