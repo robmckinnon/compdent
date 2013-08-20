@@ -3,6 +3,6 @@ rvm:
   - 1.9.3
 services: mongodb
 before_install:
-  - "apt-get install libicu-dev"
+  - "sudo apt-get install libicu-dev"
 # uncomment this line if your project needs to run something other than `rake`:
 # script: bundle exec rspec spec
