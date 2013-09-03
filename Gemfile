@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'nokogiri'
-gem 'mongoid' # model and repository framework
+gem 'mongoid', '~> 3.1' # model and repository framework
 gem 'grackle' # wrapper around Twitter REST and Search APIs
 gem 'morph'
 gem 'json'
