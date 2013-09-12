@@ -13,6 +13,9 @@ module Compdent
     field :url, :type => String
     field :following_ids, :type => Array
 
+    field :description, :type => String
+    field :location, :type => String
+
     attr_readonly :user_id
 
     index({ :user_id => 1 }, :unique => true, :name => 'user_id_index' )
@@ -72,9 +75,9 @@ module Compdent
         puts @data.url
         url = @data.url
       end
-      { :name => @data.name,
-        :screen_name => @data.screen_name,
-        :url => url }
+      attributes = { :name => @data.name, :screen_name => @data.screen_name, :url => url }
+      attributes.merge!({ :description => @data.description, :location => @data.location }) if url
+      attributes
     end
   end
 end
