@@ -9,7 +9,7 @@ module Compdent
 
     field :uri, :type => String
     field :content, :type => String
-
+    field :has_opening_times, :type => Boolean
     attr_readonly :uri
 
     index({ :uri => 1 }, :unique => true, :name => 'uri_index' )
