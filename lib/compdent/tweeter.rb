@@ -40,7 +40,7 @@ module Compdent
       def needs_update following_ids
         following_ids.map do |id|
           tweeter = where(user_id: id).only(:user_id, :url, :following_ids).first
-          if tweeter && tweeter.url && tweeter.url[/\.se(\/|$)/] && tweeter.following_ids.nil?
+          if tweeter && tweeter.url && tweeter.url[/\.co\.uk(\/|$)/] && tweeter.following_ids.nil?
             tweeter
           else
             nil
@@ -78,10 +78,22 @@ module Compdent
         puts @data.url
         url = @data.url
       end
-      uri = url ? Compdent::WebPage.canonical_uri(url) : nil
+      uri = url ? canonical(url) : nil
       attributes = { :name => @data.name, :screen_name => @data.screen_name, :url => url, :uri => uri }
       attributes.merge!({ :description => @data.description, :location => @data.location }) if url
       attributes
+    end
+
+    def canonical url
+      begin
+        Compdent::WebPage.canonical_uri(url)
+      rescue Exception
+        begin
+          Compdent::WebPage.canonical_uri(URI.encode(url))
+        rescue Exception
+          nil
+        end
+      end
     end
   end
 end
