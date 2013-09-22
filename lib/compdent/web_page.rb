@@ -1,4 +1,5 @@
 require 'uri'
+require 'fileutils'
 
 module Compdent
 
@@ -30,8 +31,15 @@ module Compdent
       if content_to_retrieve? && (body = UriScraper.get_response_body(uri))
         begin
           if body.size > 0
-            update_attribute(:content, body)
+            u = Uri.new(uri)
+            dir = "./data/#{u.tld}/#{u.hostname[0..0]}"
+            FileUtils.mkdir_p(dir) unless Dir.exists?(dir)
+            filename = "#{dir}/#{u.host.gsub('/','_')}"
+            File.open(filename,'w') { |f| f.write body }
+            update_attribute(:content, filename)
             puts uri if content
+            puts filename if content
+            puts '--'
           end
         rescue Exception => e
           puts e.to_s
@@ -71,6 +79,18 @@ module Compdent
 
     def host_uri?
       (@uri.path == '' || @uri.path == '/') && @uri.query == nil
+    end
+
+    def tld
+      host.split('.')[-1]
+    end
+
+    def hostname
+      host.split('.')[-2]
+    end
+
+    def host
+      @uri.host
     end
   end
 

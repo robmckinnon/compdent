@@ -2,6 +2,7 @@
 *.rbc
 .bundle
 .config
+config/mongoid.yml
 bin/
 coverage
 InstalledFiles

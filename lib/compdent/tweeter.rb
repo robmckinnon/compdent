@@ -11,6 +11,7 @@ module Compdent
     field :screen_name, :type => String
     field :name, :type => String
     field :url, :type => String
+    field :uri, :type => String
     field :following_ids, :type => Array
 
     field :description, :type => String
@@ -18,7 +19,9 @@ module Compdent
 
     attr_readonly :user_id
 
-    index({ :user_id => 1 }, :unique => true, :name => 'user_id_index' )
+    index({ :user_id => 1 }, :unique => true, :name => 'user_id_index', :background => true )
+    index({ :screen_name => 1 }, :unique => true, :name => 'screen_name_index', :background => true )
+    index({ :uri => 1 }, :name => 'uri_index', :background => true )
 
     class << self
 
@@ -36,8 +39,8 @@ module Compdent
 
       def needs_update following_ids
         following_ids.map do |id|
-          tweeter = where(user_id: id).first
-          if tweeter && tweeter.url && tweeter.url[/co.uk(\/|$)/] && tweeter.following_ids.nil?
+          tweeter = where(user_id: id).only(:user_id, :url, :following_ids).first
+          if tweeter && tweeter.url && tweeter.url[/\.se(\/|$)/] && tweeter.following_ids.nil?
             tweeter
           else
             nil
@@ -75,7 +78,8 @@ module Compdent
         puts @data.url
         url = @data.url
       end
-      attributes = { :name => @data.name, :screen_name => @data.screen_name, :url => url }
+      uri = url ? Compdent::WebPage.canonical_uri(url) : nil
+      attributes = { :name => @data.name, :screen_name => @data.screen_name, :url => url, :uri => uri }
       attributes.merge!({ :description => @data.description, :location => @data.location }) if url
       attributes
     end

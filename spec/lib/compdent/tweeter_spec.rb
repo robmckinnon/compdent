@@ -58,7 +58,10 @@ describe TwitterScraper do
     let(:data) { mock('tweeter', :name => name,
       :url => url,
       :id => user_id,
-      :screen_name => screen_name ) }
+      :screen_name => screen_name,
+      :description => nil,
+      :location => nil
+    ) }
 
     after { Tweeter.delete_all }
 

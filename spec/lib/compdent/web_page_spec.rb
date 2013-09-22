@@ -69,7 +69,7 @@ describe WebPage do
       it 'should persist content' do # tests mongoid
         stub_request(:get, "example.com").to_return :body => 'body'
         WebPage.from_uri(uri)
-        WebPage.find_by(:uri => WebPage.canonical_uri(uri)).content.should == 'body'
+        WebPage.find_by(:uri => WebPage.canonical_uri(uri)).content.should == './data/com/e/example.com'
         WebPage.delete_all
       end
     end
